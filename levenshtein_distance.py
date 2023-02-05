@@ -26,7 +26,7 @@ def levenshtein_distance(s1, t1, ratio_calculation=False):
                                               calc_distance[row][col - 1] + 1,  # Cost of insertions
                                               calc_distance[row - 1][col - 1] + cost)  # Cost of substitutions
             if ratio_calculation == True:
-                    # Computation of the Levenshtein calc_distance Ratio
+                # Computation of the Levenshtein calc_distance Ratio
                 Ratio = ((len(s1) + len(t1)) - calc_distance[row][col]) / (len(s1) + len(t1))
                 return Ratio
             else:

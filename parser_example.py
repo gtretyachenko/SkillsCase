@@ -40,7 +40,7 @@ def generate_search_url(query, sort_by, by_title, with_images, owner):
     raises ValueError if sort_by or owner argument is not correct
     '''
 
-    sort_values = {'date' : '104', 'price' : '1', 'price_desc' : '2', None : '101'}
+    sort_values = {'date': '104', 'price': '1', 'price_desc': '2', None: '101'}
     owners = {'private': '1', 'company': '2', None: '0'}
     if sort_by not in sort_values:
         raise ValueError('Sorting by {} is not supported'.format(sort_by))
@@ -48,10 +48,10 @@ def generate_search_url(query, sort_by, by_title, with_images, owner):
         raise ValueError('Owner can be only private or company')
     urlencoded_query = quote(query)
     return 'https://_________________________?s={}&bt={}&q={}&i={}&user={}'.format(sort_values[sort_by],
-                                                                             int(by_title),
-                                                                             urlencoded_query,
-                                                                             int(with_images),
-                                                                             owners[owner])+'&p={}'
+                                                                                   int(by_title),
+                                                                                   urlencoded_query,
+                                                                                   int(with_images),
+                                                                                   owners[owner]) + '&p={}'
 
 
 def agregate_ad_info(ad):
@@ -88,7 +88,7 @@ def normalize_date(date):
     '''
     if 'Вчера' in date or 'Сегодня' in date:
         date = convert_relative_date_to_absolute(date)
-        return str(datetime.strptime(date, '%d %m %Y %H:%M'))[:-3] # seconds removed
+        return str(datetime.strptime(date, '%d %m %Y %H:%M'))[:-3]  # seconds removed
     date = replace_month_name_with_number(date)
     if ':' in date:
         return str(datetime.strptime(date, '%d %m %H:%M').replace(year=get_current_year()))[:-3]

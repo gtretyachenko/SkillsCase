@@ -2,7 +2,8 @@
 from airflow import DAG
 from airflow.utils.dates import days_ago
 from datetime import datetime
-import qlikfunctions
+import functions_interface as qlikfunctions
+
 
 tasksDict = {
     u'NP. CSV Выгрузка дневных отчетов ГД': {

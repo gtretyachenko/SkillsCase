@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 
 class TooManyRequests(Exception):
-    '''raises in fetch_page function if request redirected to https://www.avito.ru/blocked'''
+    '''raises in fetch_page function if request redirected to https://'''
     pass
 
 
@@ -20,7 +20,7 @@ def get_all_ads(query, sort_by=None, by_title=False, with_images=False, owner=No
     Keyword arguments:
     query -- search query, like 'audi tt'
     sort_by -- method of sorting, 'date', 'price', 'price_desc' (price descending)
-               default None (yields ads sorted by Avito algorithm)
+               default None (yields ads sorted by Enterprise algorithm)
     by_title -- if True yields only ads with query in title
                 default False
     with_images -- if True yields only ads with query in title
@@ -39,6 +39,7 @@ def generate_search_url(query, sort_by, by_title, with_images, owner):
 
     raises ValueError if sort_by or owner argument is not correct
     '''
+
     sort_values = {'date' : '104', 'price' : '1', 'price_desc' : '2', None : '101'}
     owners = {'private': '1', 'company': '2', None: '0'}
     if sort_by not in sort_values:
@@ -46,7 +47,7 @@ def generate_search_url(query, sort_by, by_title, with_images, owner):
     if owner not in owners:
         raise ValueError('Owner can be only private or company')
     urlencoded_query = quote(query)
-    return 'https://www.avito.ru/moskva?s={}&bt={}&q={}&i={}&user={}'.format(sort_values[sort_by],
+    return 'https://_________________________?s={}&bt={}&q={}&i={}&user={}'.format(sort_values[sort_by],
                                                                              int(by_title),
                                                                              urlencoded_query,
                                                                              int(with_images),
@@ -147,11 +148,11 @@ def get_ads_from_page(page):
 def fetch_page(page_url):
     '''Returns page html as string
 
-    raises TooManyRequest if request redirected to https://www.avito.ru/blocked
+    raises TooManyRequest if request redirected to https://www.Enterprise.ru/blocked
     '''
 
     responce = requests.get(page_url)
-    if responce.url == 'https://www.avito.ru/blocked':
+    if responce.url == 'https://www.Enterprise.ru/blocked':
         raise TooManyRequests('IP temporarily blocked')
     return requests.get(page_url).text
 

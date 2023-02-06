@@ -4,7 +4,7 @@
 # *********Импорт системных библиотек***************
 import os
 from abc import ABC
-# import sys
+import sys
 # from pathlib import Path
 # from datetime import datetime
 # # Импорт почтового сервера
@@ -40,9 +40,11 @@ class ConfigConnector(object):
                 print(f'Файл поврежден config.ini err:{exp}')
         else:
             try:
-                raise ValueError
-            except ValueError as exp:
+                raise SystemExit(1)
+            except SystemExit as exp:
                 print(f'В проекте отсутствует файл config.ini err:{exp}')
+            finally:
+                sys.exit(1)
 
     def read_settings(self):
         res = {}
@@ -88,6 +90,7 @@ class ConfigConnector(object):
 # ////////////////////////////MY SQL//////////////////////////
 class MySqlConnector(object):
     config = ConfigConnector()
+
 
     def __init__(self, env=None):
         self._connect = None
@@ -162,14 +165,14 @@ class MySqlConnector(object):
         return result
 
 
-# ////////////////////////////SEND TO EMAIL//////////////////////////
-class EMailConnector:
+# ////////////////////////////EMAIL//////////////////////////
+class EMailConnector(object):
     config = ConfigConnector()
     pass
 
 
 # //////////////////////////TASKS MANAGER////////////////////////////
-class DataTask(MySqlConnector, ABC):
+class DataTask(ABC):
     list_temp_files = []
     to_pdf = []
 

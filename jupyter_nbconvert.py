@@ -1,9 +1,9 @@
 # !/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Импорт системных библиотек
+# *********Импорт системных библиотек***************
 import os
-from abc import ABC, abstractmethod
+from abc import ABC
 # import re
 # import numpy as np
 # import pandas as pd
@@ -12,6 +12,7 @@ from pymysql import Error
 import configparser as cnf
 
 
+# ///////////////Config.ini//////////////////////////
 class ConfigConnector(object):
 
     def __init__(self):
@@ -70,6 +71,7 @@ class ConfigConnector(object):
             self._connect.write(config_file)
 
 
+# ////////////////////////////MY SQL//////////////////////////
 class MySqlConnector(object):
     config = ConfigConnector()
 
@@ -146,16 +148,18 @@ class MySqlConnector(object):
         return result
 
 
-class InterfaceDataTask(ABC):
+# //////////////////////////TASKS MANAGER////////////////////////////
+class DataTask(MySqlConnector, ABC):
     list_temp_files = []
     to_pdf = []
 
-    @abstractmethod
-    def read_data_frame(self, source, df_name):
+    @staticmethod
+    def read_data_frame(source, df_name):
         if source == 'SQL':
             connection_to_mysql = MySqlConnector()
             _sql = '''
-            SELECT * FROM {table_name}
+                SELECT * FROM {table_name}
+                
             '''.format(table_name=df_name)
             return connection_to_mysql.execute_query(_sql)
         elif source == 'CSV':
@@ -168,12 +172,12 @@ class InterfaceDataTask(ABC):
             pass
             return
 
-    @abstractmethod
-    def transform_data_frame(self, df, method):
+    @staticmethod
+    def transform_data_frame(df, method):
         pass
 
-    @abstractmethod
-    def load_to_sql(self, df, tbl_name, method):
+    @staticmethod
+    def load_to_sql(df, tbl_name, method):
         connection_to_mysql = MySqlConnector()
         str_headers = connection_to_mysql.get_table_headers(tbl_name).join(',')
         str_val = '%s,' * str_headers.count(',')
@@ -186,38 +190,40 @@ class InterfaceDataTask(ABC):
         elif method == "SET":
             pass
 
-    @abstractmethod
-    def call_sql_procedure(self, procedure_name):
+    @staticmethod
+    def call_sql_procedure(procedure_name):
+        connection_to_mysql = MySqlConnector()
+        procedure_name + connection_to_mysql  # STOP!
         pass
 
-    @abstractmethod
-    def eda_analitics(self, filename=None, to_pdf=None):
+    @staticmethod
+    def eda_analitics(filename=None, to_pdf=None):
         if not to_pdf:
             if not filename:
-                self.__create_df_temp_file(InterfaceDataTask.list_temp_files[-1])
+                DataTask().__create_df_temp_file(DataTask.list_temp_files[-1])
             else:
-                self.__excute_ipynb_to_pdf(self, filename)
+                DataTask().__excute_ipynb_to_pdf(filename)
         pass
 
-    @abstractmethod
-    def __create_df_temp_file(self, filename):
+    @staticmethod
+    def __create_df_temp_file(filename):
         try:
-            InterfaceDataTask.list_temp_files.append(filename)
+            DataTask.list_temp_files.append(filename)
             pass
         except BaseException as exc:
             print(f'Не возможно сохранить временный файл: {filename} err: {exc}')
 
-    @abstractmethod
-    def __excute_ipynb_to_pdf(self, filename=None):
+    @staticmethod
+    def __excute_ipynb_to_pdf(filename=None):
         if not filename:
-            filename = InterfaceDataTask.list_temp_files[-1]
+            filename = DataTask.list_temp_files[-1]
         try:
             os.system(f'jupyter nbconvert --to webpdf --allow-chromium-download {filename}.ipynb')
         except BaseException as exc:
             print(f'Ошибка зауска файла {filename}.ipynb err: {exc}')
 
 
-data_task = InterfaceDataTask()
-data_task.load_to_sql(
-    df=data_task.transform_data_frame(
-        df=data_task.read_data_frame(source='SQL', df_name='fact'), method='qwe'), tbl_name='', method='INS')
+etl = DataTask()
+etl.load_to_sql(
+    df=etl.transform_data_frame(
+        df=etl.read_data_frame(source='SQL', df_name='fact'), method='qwe'), tbl_name='', method='INS')

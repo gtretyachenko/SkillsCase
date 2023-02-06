@@ -148,51 +148,76 @@ class MySqlConnector(object):
 
 class InterfaceDataTask(ABC):
     list_temp_files = []
-    info = '''
-    Задание на обмен
-    
-   
-    3. Анализ структуры
-    4. 
-    
-    
-    '''
+    to_pdf = []
 
     @abstractmethod
-    def read_data_frame(self, application=None, df_name=''):
-        try:
-            if application == 'SQL' and df_name != '':
-                connection_to_mysql = MySqlConnector()
-                _sql = '''
-                SELECT * FROM {table_name}
-                '''.format(table_name=df_name)
-                return connection_to_mysql.execute_query(_sql)
-        except BaseException as exc:
-            print(f'Ошибка чтения данных {df_name}.ipynb err: {exc}')
-
-    @abstractmethod
-    def load_to_sql(self, df, tbl_name, method):
-        try:
+    def read_data_frame(self, source, df_name):
+        if source == 'SQL':
             connection_to_mysql = MySqlConnector()
-            str_headers = connection_to_mysql.get_table_headers(tbl_name).join(',')
-            str_val = '%s,' * str_headers.count(',')
-            if method == "REP":
-                _sql = f'''REPLACE {str_headers} INTO {tbl_name} VALUES {str_val} '''
-                connection_to_mysql.execute_many_query(_sql, df)
-            elif method == "INS":
-                _sql = f'''INSERT INTO {tbl_name} VALUES {str_val} '''
-                connection_to_mysql.execute_many_query(_sql, df)
-        except BaseException as exc:
-            print(f'Ошибка загрузки данных в MySQL tbl: {tbl_name} err: {exc}')
+            _sql = '''
+            SELECT * FROM {table_name}
+            '''.format(table_name=df_name)
+            return connection_to_mysql.execute_query(_sql)
+        elif source == 'CSV':
+            pass
+            return
+        elif source == 'XLSX':
+            pass
+            return
+        elif source == 'TXT':
+            pass
+            return
 
     @abstractmethod
-    def create_df_temp_file(self, filename):
-        InterfaceDataTask.list_temp_files.append(filename)
+    def transform_data_frame(self, df, method):
         pass
 
     @abstractmethod
-    def excute_ipynb_to_pdf(self, filename):
+    def load_to_sql(self, df, tbl_name, method):
+        connection_to_mysql = MySqlConnector()
+        str_headers = connection_to_mysql.get_table_headers(tbl_name).join(',')
+        str_val = '%s,' * str_headers.count(',')
+        if method == "REP":
+            _sql = f'''REPLACE {str_headers} INTO {tbl_name} VALUES {str_val} '''
+            connection_to_mysql.execute_many_query(_sql, df)
+        elif method == "INS":
+            _sql = f'''INSERT INTO {tbl_name} VALUES {str_val} '''
+            connection_to_mysql.execute_many_query(_sql, df)
+        elif method == "SET":
+            pass
+
+    @abstractmethod
+    def call_sql_procedure(self, procedure_name):
+        pass
+
+    @abstractmethod
+    def eda_analitics(self, filename=None, to_pdf=None):
+        if not to_pdf:
+            if not filename:
+                self.__create_df_temp_file(InterfaceDataTask.list_temp_files[-1])
+            else:
+                self.__excute_ipynb_to_pdf(self, filename)
+        pass
+
+    @abstractmethod
+    def __create_df_temp_file(self, filename):
+        try:
+            InterfaceDataTask.list_temp_files.append(filename)
+            pass
+        except BaseException as exc:
+            print(f'Не возможно сохранить временный файл: {filename} err: {exc}')
+
+    @abstractmethod
+    def __excute_ipynb_to_pdf(self, filename=None):
+        if not filename:
+            filename = InterfaceDataTask.list_temp_files[-1]
         try:
             os.system(f'jupyter nbconvert --to webpdf --allow-chromium-download {filename}.ipynb')
         except BaseException as exc:
             print(f'Ошибка зауска файла {filename}.ipynb err: {exc}')
+
+
+data_task = InterfaceDataTask()
+data_task.load_to_sql(
+    df=data_task.transform_data_frame(
+        df=data_task.read_data_frame(source='SQL', df_name='fact'), method='qwe'), tbl_name='', method='INS')

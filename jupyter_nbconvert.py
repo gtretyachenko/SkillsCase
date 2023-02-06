@@ -43,32 +43,32 @@ class ConfigConnector(object):
     def get_settings(self, page, header):
         return self._connect.get(page, header)
 
-    def add_settings(self, page, headers=None, values=None):
-        if headers:
-            if len(headers) == len(values):
-                for head, val in headers, values:
-                    self._connect.set(page, head, val)
-            else:
-                return None
-        else:
-            self._connect.add_section(page)
-        with open(self.path_to_me, "w") as config_file:
-            self._connect.write(config_file)
-
-    def change_setting(self, page, headers, new_values):
-        for head, val in headers, new_values:
-            self._connect.set(page, head, val)
-        with open(self.path_to_me, "w") as config_file:
-            self._connect.write(config_file)
-
-    def del_setting(self, page, headers=None):
-        if headers:
-            self._connect.remove_section(page)
-        else:
-            for head in headers:
-                self._connect.remove_option(page, head)
-        with open(self.path_to_me, "w") as config_file:
-            self._connect.write(config_file)
+    # def add_settings(self, page, headers=None, values=None):
+    #     if headers:
+    #         if len(headers) == len(values):
+    #             for head, val in headers, values:
+    #                 self._connect.set(page, head, val)
+    #         else:
+    #             return None
+    #     else:
+    #         self._connect.add_section(page)
+    #     with open(self.path_to_me, "w") as config_file:
+    #         self._connect.write(config_file)
+    #
+    # def change_setting(self, page, headers, new_values):
+    #     for head, val in headers, new_values:
+    #         self._connect.set(page, head, val)
+    #     with open(self.path_to_me, "w") as config_file:
+    #         self._connect.write(config_file)
+    #
+    # def del_setting(self, page, headers=None):
+    #     if headers:
+    #         self._connect.remove_section(page)
+    #     else:
+    #         for head in headers:
+    #             self._connect.remove_option(page, head)
+    #     with open(self.path_to_me, "w") as config_file:
+    #         self._connect.write(config_file)
 
 
 # ////////////////////////////MY SQL//////////////////////////
@@ -148,6 +148,12 @@ class MySqlConnector(object):
         return result
 
 
+# ////////////////////////////MY SQL//////////////////////////
+class EMailConnector:
+    config = ConfigConnector()
+    pass
+
+
 # //////////////////////////TASKS MANAGER////////////////////////////
 class DataTask(MySqlConnector, ABC):
     list_temp_files = []
@@ -223,7 +229,8 @@ class DataTask(MySqlConnector, ABC):
             print(f'Ошибка зауска файла {filename}.ipynb err: {exc}')
 
 
-etl = DataTask()
-etl.load_to_sql(
-    df=etl.transform_data_frame(
-        df=etl.read_data_frame(source='SQL', df_name='fact'), method='qwe'), tbl_name='', method='INS')
+if __name__ == '__main__':
+    etl = DataTask()
+    etl.load_to_sql(
+        df=etl.transform_data_frame(
+            df=etl.read_data_frame(source='SQL', df_name='fact'), method='qwe'), tbl_name='', method='INS')

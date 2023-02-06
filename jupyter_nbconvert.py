@@ -4,6 +4,20 @@
 # *********Импорт системных библиотек***************
 import os
 from abc import ABC
+# import sys
+# from pathlib import Path
+# from datetime import datetime
+# # Импорт почтового сервера
+# import smtplib
+# # Импорт библиотек конструктора электронных писем
+# from email import message
+# # Импорт библиотек конструктора электронных писем
+# from email import encoders
+# from email.mime.base import MIMEBase
+# from email.mime.text import MIMEText
+# from email.mime.image import MIMEImage
+# from email.mime.multipart import MIMEMultipart
+# from email.header import Header
 # import re
 # import numpy as np
 # import pandas as pd
@@ -148,7 +162,7 @@ class MySqlConnector(object):
         return result
 
 
-# ////////////////////////////MY SQL//////////////////////////
+# ////////////////////////////SEND TO EMAIL//////////////////////////
 class EMailConnector:
     config = ConfigConnector()
     pass
